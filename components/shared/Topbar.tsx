@@ -1,4 +1,5 @@
 import { OrganizationSwitcher, SignOutButton, SignedIn } from "@clerk/nextjs"
+import { dark } from "@clerk/themes"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -14,18 +15,18 @@ function Topbar(){
                     <SignOutButton>
                         <div className="flex cursor-pointer">
                          <Image src="/assets/logout.svg" height={24} width={24} alt="logout"/>
-                         <OrganizationSwitcher
+                        </div>
+                    </SignOutButton>
+                </SignedIn>
+            </div>
+            <OrganizationSwitcher
                         appearance={{
+                            baseTheme:dark,
                             elements:{
                                 organizationSwitcherTrigger:
                                 "py-2 px-4"
                             }
                         }}/>
-                        </div>
-                        
-                    </SignOutButton>
-                </SignedIn>
-            </div>
         </div>
     </nav>
     )
