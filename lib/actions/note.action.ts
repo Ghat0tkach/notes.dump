@@ -60,3 +60,72 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     throw new Error("Failed to fetch posts", error.message);
   }
 }
+
+export async function fetchNoteById(id: string) {
+  connectToDB();
+  try {
+    const note = await Note.findById(id)
+      .populate({
+        path: "author",
+        model: User,
+        select: "_id name parentId image",
+      })
+      .populate({
+        path: "children",
+        populate: [
+          {
+            path: "author",
+            model: User,
+            select: "_id name parentId image",
+          },
+          {
+            path: "children",
+            populate: {
+              path: "author",
+              model: User,
+              select: "_id name parentId image",
+            },
+          },
+        ],
+      })
+      .exec();
+
+    return note;
+  } catch (error: any) {
+    throw new Error("Failed to fetch thread", error.message);
+  }
+}
+
+export async  function addCommentToNote(
+  noteId:string,
+  commentText:string,
+  userId:string,
+  path:string
+
+){
+  connectToDB();
+  try {
+    const originalNote=await Note.findById(noteId);
+    if(!originalNote){
+      throw new Error("Note not found")
+    }
+    // create a new note with comment text
+
+    const commentNote=new Note({
+      text:commentText,
+      author:userId,
+      parentId:noteId,
+    })
+
+    const savedCommentNote=await commentNote.save();
+
+    // add the comment note to the original note
+    originalNote.children.push(savedCommentNote._id);
+
+    //save original note
+    await originalNote.save();
+    revalidatePath(path);
+  } catch (error:any) {
+    throw new Error("Failed to add comment to note",error.message)
+  }
+}
