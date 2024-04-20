@@ -96,28 +96,27 @@ export async function fetchNoteById(id: string) {
   }
 }
 
-export async  function addCommentToNote(
-  noteId:string,
-  commentText:string,
-  userId:string,
-  path:string
-
-){
+export async function addCommentToNote(
+  noteId: string,
+  commentText: string,
+  userId: string,
+  path: string
+) {
   connectToDB();
   try {
-    const originalNote=await Note.findById(noteId);
-    if(!originalNote){
-      throw new Error("Note not found")
+    const originalNote = await Note.findById(noteId);
+    if (!originalNote) {
+      throw new Error("Note not found");
     }
     // create a new note with comment text
 
-    const commentNote=new Note({
-      text:commentText,
-      author:userId,
-      parentId:noteId,
-    })
+    const commentNote = new Note({
+      text: commentText,
+      author: userId,
+      parentId: noteId,
+    });
 
-    const savedCommentNote=await commentNote.save();
+    const savedCommentNote = await commentNote.save();
 
     // add the comment note to the original note
     originalNote.children.push(savedCommentNote._id);
@@ -125,7 +124,7 @@ export async  function addCommentToNote(
     //save original note
     await originalNote.save();
     revalidatePath(path);
-  } catch (error:any) {
-    throw new Error("Failed to add comment to note",error.message)
+  } catch (error: any) {
+    throw new Error("Failed to add comment to note", error.message);
   }
 }

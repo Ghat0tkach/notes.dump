@@ -17,6 +17,7 @@ import { Input } from "../ui/input";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { addCommentToNote } from "@/lib/actions/note.action";
+import { revalidatePath } from "next/cache";
 
 interface Props {
   noteId: string;
@@ -44,7 +45,7 @@ const Comments = ({ noteId, currentUserImg, currentUserId }: Props) => {
       pathname
     );
 
-    router.push("/");
+    form.reset();
   };
 
   return (
