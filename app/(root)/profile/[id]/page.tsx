@@ -8,7 +8,7 @@ import Image from "next/image";
 import NotesTab from "@/components/shared/NotesTab";
 const Page = async ({ params }: { params: { id: string } }) => {
   const user = await currentUser();
-  if (!user) return null;
+  if (!user) return redirect("/sign-in");
   const userInfo = await fetchUser(params.id);
   if (!userInfo?.onboarded) redirect("/onboarding");
   return (
