@@ -12,7 +12,6 @@ import { revalidatePath } from "next/cache";
 import User from "../models/user.model";
 import { connectToDB } from "../mongoose";
 import Note from "../models/note.model";
-import { getJsPageSizeInKb } from "next/dist/build/utils";
 import { FilterQuery, SortOrder } from "mongoose";
 
 export async function updateUser({
@@ -111,5 +110,34 @@ export async function fetchUsers({
     return { users, isNext };
   } catch (error: any) {
     throw new Error("Failed to fetch users", error.message);
+  }
+}
+
+export async function getActivity(userId: string) {
+  try {
+    connectToDB();
+
+    const userNotes = await Note.find({ author: userId });
+
+    //collect all child thread ids (replies)
+    const childNoteIds = userNotes.reduce((acc, userNote) => {
+      return acc.concat(userNote.children);
+    }, []);
+
+    //const replies
+
+    // Find and return the child threads (replies) excluding the ones created by the same user
+    const replies = await Note.find({
+      _id: { $in: childNoteIds },
+      author: { $ne: userId }, // Exclude threads authored by the same user
+    }).populate({
+      path: "author",
+      model: User,
+      select: "name image _id",
+    });
+    return replies;
+  } catch (error: any) {
+    console.error("Error fetching replies: ", error);
+    throw error;
   }
 }

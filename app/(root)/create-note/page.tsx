@@ -10,10 +10,10 @@ async function Page() {
 
   if (!userInfo?.onboarded) redirect("/onboarding");
   return (
-    <div>
+    <>
       <h1 className="head-text">Create Note</h1>
       <PostNote userId={userInfo._id} />
-    </div>
+    </>
   );
 }
 
